@@ -661,7 +661,7 @@ button.active {
 /* ---------- Gamification ---------- */
 #gamification-bar {
     position: fixed;
-    bottom: 0; left: 0; right: 0;
+    bottom: 24px; left: 0; right: 0;
     background: rgba(10, 14, 30, 0.8);
     backdrop-filter: blur(16px);
     border-top: 1px solid var(--glass-border);
@@ -958,4 +958,40 @@ button.active {
 }
 .mascot-text p {
     margin-bottom: 6px;
+}
+
+/* ---------- Footer ---------- */
+#site-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    text-align: center;
+    padding: 5px 16px;
+    font-size: .65rem;
+    color: var(--text-muted);
+    background: rgba(10, 14, 26, 0.75);
+    border-top: 1px solid rgba(110, 168, 254, 0.08);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    letter-spacing: .3px;
+    opacity: .6;
+    transition: opacity .3s ease;
+}
+#site-footer:hover {
+    opacity: 1;
+}
+#site-footer p {
+    margin: 0;
+}
+#site-footer a {
+    color: var(--accent);
+    text-decoration: none;
+    opacity: .75;
+    transition: opacity .25s ease;
+}
+#site-footer a:hover {
+    opacity: 1;
+    text-decoration: underline;
 }
