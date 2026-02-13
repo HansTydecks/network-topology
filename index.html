@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Netzwerktopologie-Simulator</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- ===== HEADER ===== -->
+    <header id="app-header">
+        <h1 data-i18n="title">🌐 Netzwerktopologie-Simulator</h1>
+        <p class="subtitle" data-i18n="subtitle">Entdecke interaktiv, wie Computernetzwerke aufgebaut sind</p>
+        <!-- Language Flags -->
+        <div id="lang-switcher">
+            <button class="lang-flag active" data-lang="de" title="Deutsch">🇩🇪</button>
+            <button class="lang-flag" data-lang="en" title="English">🇬🇧</button>
+            <button class="lang-flag" data-lang="uk" title="Українська">🇺🇦</button>
+            <button class="lang-flag" data-lang="fr" title="Français">🇫🇷</button>
+            <button class="lang-flag" data-lang="es" title="Español">🇪🇸</button>
+        </div>
+    </header>
+
+    <!-- ===== MAIN LAYOUT ===== -->
+    <div id="app-container">
+
+        <!-- LEFT PANEL: Tools -->
+        <aside id="left-panel" class="panel glass">
+            <!-- Advanced Mode Toggle -->
+            <div class="advanced-toggle-section">
+                <label class="toggle-switch" title="Fortgeschrittenen-Modus aktivieren">
+                    <input type="checkbox" id="toggle-advanced">
+                    <span class="toggle-slider"></span>
+                <span class="toggle-label" data-i18n="advancedLabel">🔬 Fortgeschritten</span>
+                </label>
+            </div>
+
+            <h2 data-i18n="tools">Werkzeuge</h2>
+
+            <div class="tool-section glass-inner">
+                <h3 data-i18n="nodesEdges">Knoten &amp; Kanten</h3>
+                <button id="btn-add-node" data-i18n="addNode">＋ Knoten hinzufügen</button>
+                <button id="btn-delete-mode" data-i18n="deleteMode">🗑 Löschen-Modus</button>
+                <button id="btn-reset" data-i18n="resetNetwork">↺ Netzwerk zurücksetzen</button>
+            </div>
+
+            <!-- Advanced: Directed graph toggle -->
+            <div class="tool-section glass-inner advanced-only hidden" id="directed-section">
+                <h3><span data-i18n="directedGraph">Gerichteter Graph</span> <button class="info-btn" data-info="directed" title="Info">ℹ</button></h3>
+                <label class="toggle-switch small">
+                    <input type="checkbox" id="toggle-directed">
+                    <span class="toggle-slider"></span>
+                    <span class="toggle-label" data-i18n="directedEdges">Gerichtete Kanten</span>
+                </label>
+                <p class="hint-text" data-i18n="directedHint">Kanten erhalten eine Richtung (Pfeil).</p>
+            </div>
+
+            <!-- Advanced: Edge weights -->
+            <div class="tool-section glass-inner advanced-only hidden" id="weights-section">
+                <h3><span data-i18n="edgeWeights">Kantengewichte</span> <button class="info-btn" data-info="weights" title="Info">ℹ</button></h3>
+                <label class="toggle-switch small">
+                    <input type="checkbox" id="toggle-weights">
+                    <span class="toggle-slider"></span>
+                    <span class="toggle-label" data-i18n="showWeights">Gewichte anzeigen</span>
+                </label>
+                <div class="form-group" id="weight-input-group" style="margin-top:6px;">
+                    <label for="edge-weight" data-i18n="defaultWeight">Standardgewicht:</label>
+                    <input type="number" id="edge-weight" value="1" min="1" max="99">
+                </div>
+            </div>
+
+            <!-- Advanced: Graph Coloring -->
+            <div class="tool-section glass-inner advanced-only hidden" id="coloring-section">
+                <h3><span data-i18n="graphColoring">Graphfärbung</span> <button class="info-btn" data-info="coloring" title="Info">ℹ</button></h3>
+                <button id="btn-color-graph" data-i18n="colorGraph">🎨 Graph färben</button>
+                <button id="btn-reset-colors" data-i18n="resetColors">↺ Farben zurücksetzen</button>
+                <div id="coloring-result" class="info-box hidden"></div>
+            </div>
+
+            <div class="tool-section glass-inner">
+                <h3 data-i18n="hints">Hinweise</h3>
+                <ul class="hints">
+                    <li data-i18n-html="hint1">Klicke auf einen <strong>Knoten</strong> und dann auf einen zweiten, um eine <strong>Kante</strong> zu erstellen.</li>
+                    <li data-i18n-html="hint2"><strong>Ziehe</strong> Knoten per Drag &amp; Drop.</li>
+                    <li data-i18n-html="hint3">Nutze den <strong>Löschen-Modus</strong>, um Elemente zu entfernen.</li>
+                </ul>
+            </div>
+
+            <div class="tool-section glass-inner">
+                <h3 data-i18n="dataflowSim">Datenfluss-Simulation</h3>
+                <div class="form-group">
+                    <label for="sim-start" data-i18n="startNode">Startknoten:</label>
+                    <select id="sim-start"><option value="">—</option></select>
+                </div>
+                <div class="form-group">
+                    <label for="sim-end" data-i18n="endNode">Zielknoten:</label>
+                    <select id="sim-end"><option value="">—</option></select>
+                </div>
+                <button id="btn-simulate" data-i18n="bfsSim">▶ BFS Simulation</button>
+                <button id="btn-flood" data-i18n="flooding">🌊 Flooding</button>
+                <!-- Advanced: DFS + BFS Traversal -->
+                <button id="btn-dfs" class="advanced-only hidden"><span data-i18n="dfsTraversal">🔍 DFS Traversierung</span> <span class="info-btn-inline" data-info="dfs">ℹ</span></button>
+                <button id="btn-bfs-traverse" class="advanced-only hidden"><span data-i18n="bfsTraversal">📡 BFS Traversierung</span> <span class="info-btn-inline" data-info="bfs">ℹ</span></button>
+                <div id="sim-result" class="info-box hidden"></div>
+            </div>
+
+            <div class="tool-section glass-inner">
+                <h3 data-i18n="failureSim">Ausfallsimulation</h3>
+                <p class="hint-text" data-i18n="failureHint">Klicke auf eine Kante, um sie zu deaktivieren/aktivieren.</p>
+                <button id="btn-failure-mode" data-i18n="failureMode">⚡ Ausfall-Modus</button>
+                <button id="btn-reset-failures" data-i18n="resetFailures">✅ Ausfälle zurücksetzen</button>
+                <div id="failure-result" class="info-box hidden"></div>
+            </div>
+
+            <!-- Advanced: Adjacency matrix toggle -->
+            <div class="tool-section glass-inner advanced-only hidden" id="matrix-section">
+                <h3><span data-i18n="adjacencyMatrix">Adjazenzmatrix</span> <button class="info-btn" data-info="matrix" title="Info">ℹ</button></h3>
+                <label class="toggle-switch small">
+                    <input type="checkbox" id="toggle-matrix">
+                    <span class="toggle-slider"></span>
+                    <span class="toggle-label" data-i18n="showMatrix">Matrix anzeigen</span>
+                </label>
+            </div>
+
+            <div class="tool-section glass-inner">
+                <h3 data-i18n="saveLoad">Speichern / Laden</h3>
+                <button id="btn-save" data-i18n="save">💾 Speichern</button>
+                <button id="btn-load" data-i18n="load">📂 Laden</button>
+                <button id="btn-export" data-i18n="exportJSON">📤 Exportieren (JSON)</button>
+                <button id="btn-import" data-i18n="importJSON">📥 Importieren (JSON)</button>
+                <input type="file" id="import-file" accept=".json" class="hidden">
+            </div>
+        </aside>
+
+        <!-- CENTER: SVG Canvas -->
+        <main id="canvas-container">
+            <svg id="network-svg" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <marker id="arrowhead" markerWidth="12" markerHeight="8" refX="30" refY="4" orient="auto" markerUnits="userSpaceOnUse">
+                        <path d="M0,0 L12,4 L0,8 Z" fill="var(--accent, #4fc3f7)"/>
+                    </marker>
+                    <marker id="arrowhead-disabled" markerWidth="12" markerHeight="8" refX="30" refY="4" orient="auto" markerUnits="userSpaceOnUse">
+                        <path d="M0,0 L12,4 L0,8 Z" fill="#ef535088"/>
+                    </marker>
+                    <marker id="arrowhead-bridge" markerWidth="12" markerHeight="8" refX="30" refY="4" orient="auto" markerUnits="userSpaceOnUse">
+                        <path d="M0,0 L12,4 L0,8 Z" fill="#ffa726"/>
+                    </marker>
+                    <marker id="arrowhead-sim" markerWidth="12" markerHeight="8" refX="30" refY="4" orient="auto" markerUnits="userSpaceOnUse">
+                        <path d="M0,0 L12,4 L0,8 Z" fill="#66bb6a"/>
+                    </marker>
+                </defs>
+            </svg>
+
+            <!-- Adjacency Matrix Overlay -->
+            <div id="matrix-overlay" class="hidden glass">
+                <h3>Adjazenzmatrix</h3>
+                <div id="matrix-content"></div>
+            </div>
+
+            <div id="canvas-status-bar">
+                <span id="mode-indicator" data-i18n="modeNormal">Modus: Normal</span>
+                <span id="edge-hint" class="hidden" data-i18n="edgeHint">Wähle den zweiten Knoten für die Kante…</span>
+            </div>
+        </main>
+
+        <!-- RIGHT PANEL: Analysis & Info -->
+        <aside id="right-panel" class="panel glass">
+            <h2 data-i18n="analysis">Analyse</h2>
+
+            <div class="analysis-section glass-inner" id="stats-section">
+                <h3 data-i18n="statistics">Statistiken</h3>
+                <table id="stats-table">
+                    <tr><td data-i18n="nodesN">Knoten (V)</td><td id="stat-n">0</td></tr>
+                    <tr><td data-i18n="edgesM">Kanten (E)</td><td id="stat-m">0</td></tr>
+                    <tr><td data-i18n="connected">Zusammenhängend</td><td id="stat-connected">—</td></tr>
+                    <tr class="advanced-row hidden"><td data-i18n="cycles">Zyklen</td><td id="stat-cycles">—</td></tr>
+                    <tr><td data-i18n="completeGraph">Vollständiger Graph</td><td id="stat-complete">—</td></tr>
+                    <tr><td data-i18n="treeStructure">Baumstruktur</td><td id="stat-tree">—</td></tr>
+                    <tr class="advanced-row hidden"><td data-i18n="cableCost">Kabelaufwand</td><td id="stat-cable">—</td></tr>
+                    <tr class="advanced-row hidden"><td data-i18n="redundancyLabel">Redundanz</td><td id="stat-redundancy">—</td></tr>
+                    <tr class="advanced-row hidden"><td data-i18n="chromaticNum">Chromatische Zahl</td><td id="stat-chromatic">—</td></tr>
+                </table>
+            </div>
+
+            <!-- ADVANCED: Knotengrade -->
+            <div class="analysis-section glass-inner advanced-only hidden" id="degree-section">
+                <h3 data-i18n="nodeDegrees">Knotengrade</h3>
+                <div id="degree-list" class="degree-list">—</div>
+            </div>
+
+            <!-- ADVANCED: Bridges -->
+            <div class="analysis-section glass-inner advanced-only hidden" id="bridges-section">
+                <h3 data-i18n="criticalEdges">Kritische Kanten (Bridges)</h3>
+                <div id="bridges-list">—</div>
+            </div>
+
+            <!-- ADVANCED: Articulation Points -->
+            <div class="analysis-section glass-inner advanced-only hidden" id="articulation-section">
+                <h3 data-i18n="articulationPoints">Artikulationsknoten</h3>
+                <div id="articulation-list">—</div>
+            </div>
+
+            <!-- NORMAL MODE: Topology (always visible) -->
+            <div class="analysis-section glass-inner" id="topology-section">
+                <h3 data-i18n="detectedTopology">Erkannte Topologie</h3>
+                <div id="topology-name" class="topology-badge">—</div>
+            </div>
+
+            <!-- Discovered Topologies Collection -->
+            <div class="analysis-section glass-inner" id="discovered-section">
+                <h3 data-i18n="discoveredTopologies">🏆 Entdeckte Topologien</h3>
+                <div id="discovered-list" class="discovered-list">
+                    <p class="hint-text">Noch keine Topologie entdeckt. Baue ein Netzwerk!</p>
+                </div>
+            </div>
+
+            <!-- ADVANCED: Traversal result -->
+            <div class="analysis-section glass-inner advanced-only hidden" id="traversal-section">
+                <h3 data-i18n="traversal">Traversierung</h3>
+                <div id="traversal-result">—</div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- ===== TOPOLOGY INFO POPUP ===== -->
+    <div id="topology-popup" class="hidden">
+        <div class="topology-popup-backdrop"></div>
+        <div class="topology-popup-content glass">
+            <button id="btn-close-topo-popup" class="popup-close">✕</button>
+            <h2 id="topo-popup-title"></h2>
+            <div class="topo-popup-body">
+                <div class="topo-field"><span class="topo-label" data-i18n="topoDefinition">📖 Definition</span><p id="topo-popup-definition"></p></div>
+                <div class="topo-field"><span class="topo-label" data-i18n="topoUsage">🏢 Typischer Einsatz</span><p id="topo-popup-usage"></p></div>
+                <div class="topo-field"><span class="topo-label" data-i18n="topoCable">🔌 Kabelaufwand</span><p id="topo-popup-cable"></p></div>
+                <div class="topo-field"><span class="topo-label" data-i18n="topoRedundancy">🛡️ Redundanz</span><p id="topo-popup-redundancy"></p></div>
+                <div class="topo-field"><span class="topo-label" data-i18n="topoPros">✅ Vorteile</span><p id="topo-popup-pros"></p></div>
+                <div class="topo-field"><span class="topo-label" data-i18n="topoCons">❌ Nachteile</span><p id="topo-popup-cons"></p></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== GAMIFICATION OVERLAY ===== -->
+    <div id="gamification-bar">
+        <button id="btn-toggle-tasks" data-i18n="tasks">🎯 Aufgaben</button>
+        <div id="progress-bar-container">
+            <div id="progress-bar"></div>
+            <span id="progress-text">0 / 0</span>
+        </div>
+    </div>
+
+    <div id="task-panel" class="hidden glass">
+        <div class="task-panel-header">
+            <h3 data-i18n="learningTasks">Lernaufgaben</h3>
+            <button id="btn-close-tasks">✕</button>
+        </div>
+        <ul id="task-list"></ul>
+    </div>
+
+    <!-- ===== FEEDBACK POPUP ===== -->
+    <div id="feedback-popup" class="hidden">
+        <div class="feedback-content glass">
+            <span id="feedback-icon"></span>
+            <p id="feedback-text"></p>
+        </div>
+    </div>
+
+    <!-- ===== MASCOT INFO POPUP ===== -->
+    <div id="mascot-popup" class="hidden">
+        <div class="mascot-popup-backdrop"></div>
+        <div class="mascot-popup-content glass">
+            <button id="btn-close-mascot-popup" class="popup-close">✕</button>
+            <div class="mascot-popup-body">
+                <img id="mascot-img" src="mascot_Byte/Info_Byte_normal_happy.png" alt="Byte" class="mascot-img">
+                <div id="mascot-text" class="mascot-text"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== EDGE WEIGHT INPUT DIALOG ===== -->
+    <div id="weight-dialog" class="hidden">
+        <div class="weight-dialog-backdrop"></div>
+        <div class="weight-dialog-content glass">
+            <h3 data-i18n="weightDialogTitle">Kantengewicht</h3>
+            <p data-i18n="weightDialogText">Gewicht für diese Kante eingeben:</p>
+            <input type="number" id="weight-dialog-input" value="1" min="1" max="99">
+            <div class="weight-dialog-buttons">
+                <button id="weight-dialog-ok" data-i18n="ok">OK</button>
+                <button id="weight-dialog-cancel" data-i18n="cancel">Abbrechen</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== SCRIPTS ===== -->
+    <script src="i18n.js"></script>
+    <script src="graph.js"></script>
+    <script src="simulation.js"></script>
+    <script src="ui.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
